@@ -22,8 +22,6 @@ export const loginSchema = Joi.object({
     password: Joi.string().label('Password').min(8).required().messages({
         'string.pattern.base': `Given password doesn't match the requirement`,
     }),
-    platform: Joi.string().valid('PHONE', 'WEB').required(),
-    deviceId: Joi.string().label('deviceId').required(),
 })
 
 export const forgetPasswordSchema = Joi.object({

@@ -1,10 +1,9 @@
 export const userDTO = {
     id: true,
-    first_name: true,
-    last_name: true,
+    name: true,
     email: true,
-    profile_picture: true,
-    bio: true,
+    role: true,
+    phone: true,
     created_at: true,
     updated_at: true,
 }
