@@ -1,0 +1,152 @@
+Enum UserRole {
+  GUEST
+  HOST
+}
+
+Enum PropertyStatus {
+  AVAILABLE
+  RENTED
+}
+
+Enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+Enum PaymentMethod {
+  STRIPE
+  KHALTI
+}
+
+Enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  RESTORE
+  LOGIN
+  LOGOUT
+  PAYMENT_SUCCESS
+  PAYMENT_FAILED
+}
+
+Table users {
+  id uuid [pk]
+  name varchar
+  email varchar [unique]
+  password varchar
+  role UserRole
+  phone varchar
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp [null]
+}
+
+Table properties {
+  id uuid [pk]
+  title varchar
+  description text
+  price float
+  type varchar
+  status PropertyStatus
+
+  host_id uuid [ref: > users.id]
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp [null]
+}
+
+Table locations {
+  id uuid [pk]
+  address varchar
+  city varchar
+  latitude float
+  longitude float
+
+  property_id uuid [unique, ref: > properties.id]
+}
+
+Table property_images {
+  id uuid [pk]
+  url varchar
+
+  property_id uuid [ref: > properties.id]
+}
+
+Table favorites {
+  id uuid [pk]
+  user_id uuid [ref: > users.id]
+  property_id uuid [ref: > properties.id]
+
+  created_at timestamp
+
+  indexes {
+    (user_id, property_id) [unique]
+  }
+}
+
+Table browsing_history {
+  id uuid [pk]
+  user_id uuid [ref: > users.id, null]
+  property_id uuid [ref: > properties.id]
+
+  viewed_at timestamp
+}
+
+Table inquiries {
+  id uuid [pk]
+  message text
+
+  guest_id uuid [ref: > users.id]
+  host_id uuid [ref: > users.id]
+  property_id uuid [ref: > properties.id]
+
+  created_at timestamp
+}
+
+Table bookings {
+  id uuid [pk]
+  guest_id uuid [ref: > users.id]
+  property_id uuid [ref: > properties.id]
+
+  start_date timestamp
+  end_date timestamp
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp [null]
+}
+
+Table payments {
+  id uuid [pk]
+  booking_id uuid [unique, ref: > bookings.id]
+  guest_id uuid [ref: > users.id]
+  host_id uuid [ref: > users.id]
+
+  amount float
+  commission float
+  method PaymentMethod
+  status PaymentStatus
+
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp [null]
+}
+
+Table audit_logs {
+  id uuid [pk]
+  entity varchar
+  entity_id uuid
+  action AuditAction
+
+  old_data json
+  new_data json
+
+  user_id uuid [ref: > users.id, null]
+  ip_address varchar
+  user_agent varchar
+
+  created_at timestamp
+}

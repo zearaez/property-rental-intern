@@ -1,0 +1,202 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+model users {
+  id         String   @id @default(uuid())
+  name       String
+  email      String   @unique
+  password   String
+  role       UserRole
+  phone      String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+  properties properties[] @relation("UserProperties")
+  favorites  favorites[]
+  browsing_history browsing_history[]
+  inquiries_guest inquiries[] @relation("GuestInquiries")
+  inquiries_host inquiries[] @relation("HostInquiries")
+  bookings_guest bookings[] @relation("GuestBookings")
+  payments_guest payments[] @relation("GuestPayments")
+  payments_host payments[] @relation("HostPayments")
+  audit_logs audit_logs[]
+}
+
+model properties {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  price       Float
+  type        String
+  status      PropertyStatus
+  host_id     String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
+  host        users    @relation(fields: [host_id], references: [id], name: "UserProperties")
+  locations   locations?
+  property_images property_images[]
+  favorites   favorites[]
+  browsing_history browsing_history[]
+  inquiries   inquiries[]
+  bookings    bookings[]
+  
+  @@index([host_id, status])
+  @@index([price])
+  @@index([created_at])
+}
+
+model locations {
+  id          String   @id @default(uuid())
+  address     String
+  city        String
+  latitude    Float
+  longitude   Float
+  property_id String   @unique
+  property    properties @relation(fields: [property_id], references: [id])
+}
+
+model property_images {
+  id          String   @id @default(uuid())
+  url         String
+  property_id String
+  property    properties @relation(fields: [property_id], references: [id])
+}
+
+model favorites {
+  id          String   @id @default(uuid())
+  user_id     String
+  property_id String
+  created_at  DateTime @default(now())
+  user        users    @relation(fields: [user_id], references: [id])
+  property    properties @relation(fields: [property_id], references: [id])
+  
+  @@unique([user_id, property_id])
+  @@index([user_id])
+  @@index([property_id])
+}
+
+model browsing_history {
+  id          String   @id @default(uuid())
+  user_id     String?
+  property_id String
+  viewed_at   DateTime
+  user        users?   @relation(fields: [user_id], references: [id])
+  property    properties @relation(fields: [property_id], references: [id])
+  
+  @@index([user_id, viewed_at])
+  @@index([property_id])
+}
+
+model inquiries {
+  id          String   @id @default(uuid())
+  message     String
+  guest_id    String
+  host_id     String
+  property_id String
+  created_at  DateTime @default(now())
+  guest       users    @relation("GuestInquiries", fields: [guest_id], references: [id])
+  host        users    @relation("HostInquiries", fields: [host_id], references: [id])
+  property    properties @relation(fields: [property_id], references: [id])
+}
+
+model bookings {
+  id          String   @id @default(uuid())
+  guest_id    String
+  property_id String
+  start_date  DateTime
+  end_date    DateTime
+  status      BookingStatus @default(PENDING)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
+  guest       users    @relation("GuestBookings", fields: [guest_id], references: [id])
+  property    properties @relation(fields: [property_id], references: [id])
+  payments    payments?
+  
+  @@index([property_id, start_date, end_date])
+  @@index([guest_id])
+  @@index([status])
+}
+
+model payments {
+  id          String   @id @default(uuid())
+  booking_id  String   @unique
+  guest_id    String
+  host_id     String
+  amount      Float
+  commission  Float
+  method      PaymentMethod
+  status      PaymentStatus
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
+  booking     bookings @relation(fields: [booking_id], references: [id])
+  guest       users    @relation("GuestPayments", fields: [guest_id], references: [id])
+  host        users    @relation("HostPayments", fields: [host_id], references: [id])
+}
+
+model audit_logs {
+  id          String   @id @default(uuid())
+  entity      String
+  entity_id   String
+  action      AuditAction
+  old_data    Json
+  new_data    Json
+  user_id     String?
+  ip_address  String
+  user_agent  String
+  created_at  DateTime @default(now())
+  user        users?   @relation(fields: [user_id], references: [id])
+  
+  @@index([entity, entity_id])
+  @@index([user_id])
+  @@index([created_at])
+  @@index([action])
+}
+
+enum UserRole {
+  GUEST
+  HOST
+}
+
+enum PropertyStatus {
+  AVAILABLE
+  RENTED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum PaymentMethod {
+  STRIPE
+  KHALTI
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  RESTORE
+  LOGIN
+  LOGOUT
+  PAYMENT_SUCCESS
+  PAYMENT_FAILED
+}

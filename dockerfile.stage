@@ -1,0 +1,19 @@
+# Use the official Node.js image as a base image
+FROM node:20
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the package.json and package-lock.json files
+COPY package*.json ./ 
+
+# Install the Node.js dependencies
+RUN yarn install
+
+# Copy the rest of the application code
+COPY . .
+
+# Expose port 8000 for the container
+EXPOSE 80
+
+CMD ["sh", "-c", "npx prisma generate && yarn build && yarn start"]
