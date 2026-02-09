@@ -1,5 +1,8 @@
 # Use the official Node.js image as a base image
-FROM node:18.17.0-alpine3.17
+FROM node:20-alpine
+
+# Install OpenSSL for Prisma
+RUN apk add --no-cache openssl openssl-dev
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -8,6 +11,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install the Node.js dependencies
+RUN corepack enable
 RUN yarn global add nodemon
 RUN yarn install
 
@@ -15,4 +19,6 @@ RUN yarn install
 COPY . .
 
 # Expose the port your application runs on
-EXPOSE 3000
+EXPOSE 8080
+
+CMD ["yarn", "dev"]

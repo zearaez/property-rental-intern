@@ -69,7 +69,9 @@ createBullBoard({
 
 app.set('app_socket', io)
 app.use('/board/queues', serverAdapter.getRouter())
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerOutput))
+const swaggerServe = swaggerUI.serve as any
+const swaggerSetup = swaggerUI.setup(swaggerOutput) as any
+app.use('/api-docs', ...swaggerServe, swaggerSetup)
 app.use('/api', routes)
 
 app.get('/', greetingHandler)

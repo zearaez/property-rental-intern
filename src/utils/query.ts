@@ -1,20 +1,10 @@
 import { config } from '@/config/config'
-import {
-    PrismaClient,
-    users as User,
-    UserRole,
-    PropertyStatus,
-    BookingStatus,
-    PaymentStatus,
-    PaymentMethod,
-    AuditAction,
-} from '@prisma/client'
+import { PrismaClient, UserRole, PropertyStatus, BookingStatus, PaymentStatus, PaymentMethod, AuditAction } from '@prisma/client'
+import type { users as User } from '@prisma/client'
 
-interface CustomNodeJsGlobal extends Global {
-    prisma?: PrismaClient
+declare global {
+    var prisma: PrismaClient | undefined
 }
-
-declare const global: CustomNodeJsGlobal
 
 const prisma =
     global?.prisma ||
