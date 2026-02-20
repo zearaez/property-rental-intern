@@ -18,6 +18,9 @@ RUN yarn install
 # Copy the rest of the application code
 COPY . .
 
+# Generate Prisma Client
+RUN npx prisma generate
+
 # Expose the port your application runs on
 EXPOSE 8080
 

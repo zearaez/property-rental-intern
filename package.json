@@ -13,7 +13,7 @@
         "dev": "nodemon",
         "start": "node dist/server.js",
         "migrate": "prisma migrate dev",
-        "generate": "prisma generate dev",
+        "generate": "prisma generate",
         "format:write": "prettier --write .",
         "lint": "eslint src/**/*.ts",
         "lint:fix": "eslint src/**/*.ts --fix",
