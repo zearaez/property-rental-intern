@@ -16,18 +16,29 @@ import {
 } from './auth.interface'
 
 export const registerService = async (body: IRegisterService): Promise<Partial<IUser>> => {
-    const { email, password } = body
-    const user = await prisma.users.findUnique({
+    const { username, email, password } = body
+    
+    // Check if username already exists
+    const existingUsername = await prisma.users.findUnique({
+        where: {
+            username: username,
+        },
+    })
+    if (existingUsername) throw new ApiError(400, 'Username already exists')
+    
+    // Check if email already exists
+    const existingEmail = await prisma.users.findUnique({
         where: {
             email: email,
         },
     })
-    if (user) throw new ApiError(400, 'User already exists')
+    if (existingEmail) throw new ApiError(400, 'Email already exists')
 
     const hash = bcrypt.hashSync(password, 10)
 
     const createdUser = await prisma.$transaction(async (txn: IPrismaClient) => {
         const userResBody = {
+            username: body.username,
             email: body.email,
             password: hash,
             name: body.name || 'New User',
@@ -38,6 +49,7 @@ export const registerService = async (body: IRegisterService): Promise<Partial<I
             data: userResBody as any,
             select: {
                 id: true,
+                username: true,
                 email: true,
                 name: true,
                 role: true,
@@ -55,12 +67,12 @@ export const registerService = async (body: IRegisterService): Promise<Partial<I
 export const loginService = async (
     payload: ILoginService
 ): Promise<Partial<IUser & { accessToken: string; refreshToken: string }>> => {
-    const { email, password } = payload
+    const { username, password } = payload
 
     const user = await prisma.users.findFirst({
         where: {
-            email: {
-                equals: email,
+            username: {
+                equals: username,
                 mode: 'insensitive',
             },
         },
@@ -84,6 +96,7 @@ export const loginService = async (
     const userResponse = {
         user: {
             id: user.id,
+            username: user.username,
             name: user.name,
             email: user.email,
             role: user.role,

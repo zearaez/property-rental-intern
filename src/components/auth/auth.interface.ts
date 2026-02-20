@@ -1,6 +1,7 @@
 import { IUser } from '@/utils/query'
 
 export type IRegisterService = {
+    username: string
     email: string
     password: string
     name?: string
@@ -9,7 +10,7 @@ export type IRegisterService = {
 }
 
 export type ILoginService = {
-    email: string
+    username: string
     password: string
 }
 

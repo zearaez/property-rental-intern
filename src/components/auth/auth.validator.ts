@@ -3,10 +3,14 @@ import { Request, Response, NextFunction } from 'express'
 import { validate } from '@/helpers/validator'
 
 export const registerSchema = Joi.object({
-    first_name: Joi.string().label('first_name').required(),
-    last_name: Joi.string().label('last_name').required(),
+    username: Joi.string().label('Username').min(3).max(30).required().messages({
+        'string.min': 'Username must be at least 3 characters long',
+        'string.max': 'Username must not exceed 30 characters',
+    }),
+    name: Joi.string().label('Name').required(),
     email: Joi.string().email().label('Email').required(),
-    provider: Joi.string().label('Provider').allow(null, ''),
+    phone: Joi.string().label('Phone').allow('', null).optional(),
+    role: Joi.string().valid('GUEST', 'HOST').label('Role').optional(),
     password: Joi.string().label('Password').min(8).required().messages({
         'string.pattern.base': `Given password doesn't match the requirement`,
     }),
@@ -18,7 +22,7 @@ export const registerSchema = Joi.object({
 })
 
 export const loginSchema = Joi.object({
-    email: Joi.string().email().label('Email').required(),
+    username: Joi.string().label('Username').required(),
     password: Joi.string().label('Password').min(8).required().messages({
         'string.pattern.base': `Given password doesn't match the requirement`,
     }),

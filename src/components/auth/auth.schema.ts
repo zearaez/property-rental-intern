@@ -1,19 +1,19 @@
 export const authSchema = {
     register: {
-        first_name: 'string',
-        last_name: 'string',
+        username: 'string',
+        name: 'string',
         email: 'string',
+        phone: 'string',
+        role: {
+            type: 'string',
+            enum: ['GUEST', 'HOST'],
+        },
         password: 'string',
         confirm_password: 'string',
     },
     login: {
-        email: 'string',
+        username: 'string',
         password: 'string',
-        deviceId: 'string',
-        platform: {
-            type: 'string',
-            enum: ['PHONE', 'WEB'],
-        },
     },
     oauthLogin: {
         provider: {

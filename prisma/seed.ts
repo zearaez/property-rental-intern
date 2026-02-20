@@ -23,6 +23,7 @@ async function main() {
     console.log('👥 Creating users...')
     const host1 = await prisma.users.create({
         data: {
+            username: 'johnsmith',
             name: 'John Smith',
             email: 'john.smith@example.com',
             password: bcrypt.hashSync('password123', 10),
@@ -33,6 +34,7 @@ async function main() {
 
     const host2 = await prisma.users.create({
         data: {
+            username: 'sarahjohnson',
             name: 'Sarah Johnson',
             email: 'sarah.johnson@example.com',
             password: bcrypt.hashSync('password123', 10),
@@ -43,6 +45,7 @@ async function main() {
 
     const guest1 = await prisma.users.create({
         data: {
+            username: 'alicebrown',
             name: 'Alice Brown',
             email: 'alice.brown@example.com',
             password: bcrypt.hashSync('password123', 10),
@@ -53,6 +56,7 @@ async function main() {
 
     const guest2 = await prisma.users.create({
         data: {
+            username: 'bobwilson',
             name: 'Bob Wilson',
             email: 'bob.wilson@example.com',
             password: bcrypt.hashSync('password123', 10),
@@ -63,6 +67,7 @@ async function main() {
 
     const guest3 = await prisma.users.create({
         data: {
+            username: 'caroldavis',
             name: 'Carol Davis',
             email: 'carol.davis@example.com',
             password: bcrypt.hashSync('password123', 10),
